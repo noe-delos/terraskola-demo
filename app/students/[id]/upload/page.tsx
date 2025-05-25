@@ -1,7 +1,6 @@
 // app/students/[id]/upload/page.tsx
 import { Header } from "@/components/layout/Header";
 import { StudentDocumentUploadForm } from "@/components/forms/StudentDocumentUploadForm";
-import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import { getStudent } from "./actions";
 
