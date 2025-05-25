@@ -19,5 +19,6 @@ export async function getStudents() {
     return [];
   }
 
+  console.log("&&-students data-&&", data);
   return data || [];
 }
