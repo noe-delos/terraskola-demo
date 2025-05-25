@@ -13,5 +13,6 @@ export async function getStudent(id: string) {
     return null;
   }
 
+  console.log("####### getStudent", data);
   return data;
 }
