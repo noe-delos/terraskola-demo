@@ -1,18 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // app/analyze/page.tsx
 import { Header } from "@/components/layout/Header";
 import { AnalysisForm } from "@/components/forms/AnalysisForm";
 import { getStudents, getCourses, getAnalyses } from "./actions";
 import { StudentCategoryTable } from "./student-category-table";
 import { AnalysisDetails } from "./analysis-details";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function AnalyzePage() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  const user = data.user;
+  if (!user) return null;
   const students = await getStudents();
   const courses = await getCourses();
   const analyses = await getAnalyses();
 
   // Split analyses into two categories
-  const goodStudents = analyses.filter((a) => a.main_category === "good");
-  const weakStudents = analyses.filter((a) => a.main_category === "bad");
+  const goodStudents = analyses.filter((a: any) => a.main_category === "good");
+  const weakStudents = analyses.filter((a: any) => a.main_category === "bad");
 
   return (
     <div className="min-h-screen bg-gray-50">

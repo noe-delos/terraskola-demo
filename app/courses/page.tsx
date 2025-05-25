@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 // app/courses/page.tsx
 import { Header } from "@/components/layout/Header";
@@ -23,9 +24,15 @@ import {
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-import { getCourses } from "./actions";
+import { getCourses, deleteCourse } from "./actions";
+import { createClient } from "@/lib/supabase/server";
+import { DeleteCourseButton } from "./DeleteCourseButton";
 
 export default async function CoursesPage() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  const user = data.user;
+  if (!user) return null;
   const courses = await getCourses();
 
   return (
@@ -107,14 +114,7 @@ export default async function CoursesPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between border-t bg-gray-50 p-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                  >
-                    <Trash2 className="mr-1 h-4 w-4" />
-                    Supprimer
-                  </Button>
+                  <DeleteCourseButton courseId={course.id} />
                 </CardFooter>
               </Card>
             ))}

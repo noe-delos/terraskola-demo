@@ -3,7 +3,7 @@
 // app/api/courses/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -12,6 +12,18 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
+    // Get user from Supabase session (SSR pattern)
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     // Parse form data
     const formData = await request.formData();
     const name = formData.get("name") as string;
@@ -48,11 +60,12 @@ export async function POST(request: NextRequest) {
     // Create folder for course if it doesn't exist
     let courseId;
 
-    // Find existing course with same name
+    // Find existing course with same name for this user
     const { data: existingCourses, error: fetchError } = await supabase
       .from("courses")
       .select("id")
-      .eq("name", name);
+      .eq("name", name)
+      .eq("user_id", user.id);
 
     if (fetchError) {
       console.error("Error checking for existing course:", fetchError);
@@ -68,7 +81,7 @@ export async function POST(request: NextRequest) {
       // Create new course
       const { data: newCourse, error: insertError } = await supabase
         .from("courses")
-        .insert([{ name }])
+        .insert([{ name, user_id: user.id }])
         .select();
 
       if (insertError) {
@@ -182,6 +195,7 @@ export async function POST(request: NextRequest) {
           file_url: fileUrl,
           file_type: isPdf ? "pdf" : "image",
           content,
+          user_id: user.id,
         },
       ])
       .select();

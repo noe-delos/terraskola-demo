@@ -1,10 +1,22 @@
 // app/api/students/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
     const { firstName, lastName } = await request.json();
+
+    // Get user from Supabase session (SSR pattern)
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
 
     // Validate inputs
     if (!firstName || !lastName) {
@@ -21,6 +33,7 @@ export async function POST(request: NextRequest) {
         {
           first_name: firstName,
           last_name: lastName,
+          user_id: user.id,
         },
       ])
       .select();

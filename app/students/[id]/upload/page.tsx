@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { StudentDocumentUploadForm } from "@/components/forms/StudentDocumentUploadForm";
 import { notFound } from "next/navigation";
 import { getStudent } from "./actions";
+import { createClient } from "@/lib/supabase/server";
 
 interface PageProps {
   params: Promise<{
@@ -13,6 +14,10 @@ interface PageProps {
 export default async function UploadStudentDocumentPage({ params }: PageProps) {
   // Await the params since it's now a Promise
   const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  const user = data.user;
+  if (!user) return notFound();
   const student = await getStudent(id);
 
   if (!student) {

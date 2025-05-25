@@ -18,8 +18,13 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { getStudents } from "./actions";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function StudentsPage() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  const user = data.user;
+  if (!user) return null;
   const students = await getStudents();
 
   return (

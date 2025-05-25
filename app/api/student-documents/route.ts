@@ -3,7 +3,7 @@
 // app/api/student-documents/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -12,6 +12,18 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
+    // Get user from Supabase session (SSR pattern)
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     // Parse form data
     const formData = await request.formData();
     const studentId = formData.get("studentId") as string;
@@ -159,6 +171,7 @@ export async function POST(request: NextRequest) {
           student_id: studentId,
           file_url: fileUrl,
           content,
+          user_id: user.id,
         },
       ])
       .select();

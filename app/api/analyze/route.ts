@@ -6,10 +6,22 @@ import {
   BedrockRuntimeClient,
   ConverseCommand,
 } from "@aws-sdk/client-bedrock-runtime";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
+    // Get user from Supabase JWT (SSR pattern: use cookies)
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     const { studentId, courseId } = await request.json();
 
     // Validate inputs
@@ -24,7 +36,8 @@ export async function POST(request: NextRequest) {
     const { data: courseDocuments, error: courseError } = await supabase
       .from("documents")
       .select("*")
-      .eq("course_id", courseId);
+      .eq("course_id", courseId)
+      .eq("user_id", user.id);
 
     if (courseError || !courseDocuments || courseDocuments.length === 0) {
       console.error("Error fetching course documents:", courseError);
@@ -43,7 +56,8 @@ export async function POST(request: NextRequest) {
     const { data: studentDocs, error: docsError } = await supabase
       .from("student_documents")
       .select("*")
-      .eq("student_id", studentId);
+      .eq("student_id", studentId)
+      .eq("user_id", user.id);
 
     if (docsError || !studentDocs || studentDocs.length === 0) {
       console.error("Error fetching student documents:", docsError);
@@ -58,6 +72,7 @@ export async function POST(request: NextRequest) {
       .from("students")
       .select("*")
       .eq("id", studentId)
+      .eq("user_id", user.id)
       .single();
 
     if (studentError || !student) {
@@ -73,6 +88,7 @@ export async function POST(request: NextRequest) {
       .from("courses")
       .select("name")
       .eq("id", courseId)
+      .eq("user_id", user.id)
       .single();
 
     if (courseInfoError || !course) {
@@ -193,6 +209,7 @@ Ta réponse ne doit contenir AUCUN texte en dehors de cet objet JSON.`;
           main_category: analysisData.main_category,
           specific_category: analysisData.specific_category,
           analysis_details: analysisData.analysis,
+          user_id: user.id,
         },
       ])
       .select();
