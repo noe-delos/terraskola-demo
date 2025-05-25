@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Loader2, UserPlus } from "lucide-react";
+import { toast } from "sonner";
 
 export function AddStudentForm() {
   const [firstName, setFirstName] = useState("");
@@ -21,11 +22,9 @@ export function AddStudentForm() {
     e.preventDefault();
 
     if (!firstName.trim() || !lastName.trim()) {
-      //   toast({
-      //     title: "Erreur",
-      //     description: "Veuillez saisir le nom et prénom de l'élève",
-      //     variant: "destructive",
-      //   });
+      toast.error("Erreur", {
+        description: "Veuillez saisir le nom et prénom de l'élève",
+      });
       return;
     }
 
@@ -48,21 +47,18 @@ export function AddStudentForm() {
         throw new Error(error.message || "Erreur lors de l'ajout de l'élève");
       }
 
-      //   toast({
-      //     title: "Succès",
-      //     description: "L'élève a été ajouté avec succès",
-      //   });
+      toast.success("Succès", {
+        description: "L'élève a été ajouté avec succès",
+      });
 
       router.push("/students");
       router.refresh();
     } catch (error) {
       console.error("Error adding student:", error);
-      //   toast({
-      //     title: "Erreur",
-      //     description:
-      //       error instanceof Error ? error.message : "Une erreur est survenue",
-      //     variant: "destructive",
-      //   });
+      toast.error("Erreur", {
+        description:
+          error instanceof Error ? error.message : "Une erreur est survenue",
+      });
     } finally {
       setIsSubmitting(false);
     }

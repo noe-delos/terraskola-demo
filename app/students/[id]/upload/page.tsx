@@ -3,25 +3,12 @@ import { Header } from "@/components/layout/Header";
 import { StudentDocumentUploadForm } from "@/components/forms/StudentDocumentUploadForm";
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
+import { getStudent } from "./actions";
 
 interface PageProps {
   params: Promise<{
     id: string;
   }>;
-}
-
-async function getStudent(id: string) {
-  const { data, error } = await supabase
-    .from("students")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (error || !data) {
-    return null;
-  }
-
-  return data;
 }
 
 export default async function UploadStudentDocumentPage({ params }: PageProps) {

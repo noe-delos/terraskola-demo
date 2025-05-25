@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, BrainCircuit } from "lucide-react";
+import { toast } from "sonner";
 
 interface Student {
   id: string;
@@ -40,11 +41,9 @@ export function AnalysisForm({ students, courses }: AnalysisFormProps) {
     e.preventDefault();
 
     if (!studentId || !courseId) {
-      //   toast({
-      //     title: "Erreur",
-      //     description: "Veuillez sélectionner un élève et un cours",
-      //     variant: "destructive",
-      //   });
+      toast.error("Erreur", {
+        description: "Veuillez sélectionner un élève et un cours",
+      });
       return;
     }
 
@@ -67,20 +66,17 @@ export function AnalysisForm({ students, courses }: AnalysisFormProps) {
         throw new Error(error.message || "Erreur lors de l'analyse");
       }
 
-      //   toast({
-      //     title: "Succès",
-      //     description: "Analyse effectuée avec succès",
-      //   });
+      toast.success("Succès", {
+        description: "Analyse effectuée avec succès",
+      });
 
       router.refresh();
     } catch (error) {
       console.error("Error analyzing:", error);
-      //   toast({
-      //     title: "Erreur",
-      //     description:
-      //       error instanceof Error ? error.message : "Une erreur est survenue",
-      //     variant: "destructive",
-      //   });
+      toast.error("Erreur", {
+        description:
+          error instanceof Error ? error.message : "Une erreur est survenue",
+      });
     } finally {
       setIsAnalyzing(false);
     }
