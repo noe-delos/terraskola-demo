@@ -15,7 +15,6 @@ import {
   Image,
 } from "lucide-react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { getStudents } from "./actions";
