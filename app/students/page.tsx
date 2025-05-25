@@ -18,26 +18,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-
-async function getStudents() {
-  const { data, error } = await supabase
-    .from("students")
-    .select(
-      `
-      *,
-      student_documents(*),
-      analyses(count)
-    `
-    )
-    .order("last_name", { ascending: true });
-
-  if (error) {
-    console.error("Error fetching students:", error);
-    return [];
-  }
-
-  return data || [];
-}
+import { getStudents } from "./actions";
 
 export default async function StudentsPage() {
   const students = await getStudents();
