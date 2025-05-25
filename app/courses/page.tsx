@@ -21,28 +21,9 @@ import {
   FileCode,
 } from "lucide-react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-
-async function getCourses() {
-  const { data, error } = await supabase
-    .from("courses")
-    .select(
-      `
-      *,
-      documents(*)
-    `
-    )
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching courses:", error);
-    return [];
-  }
-
-  return data || [];
-}
+import { getCourses } from "./actions";
 
 export default async function CoursesPage() {
   const courses = await getCourses();
