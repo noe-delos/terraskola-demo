@@ -1,4 +1,3 @@
-"use server";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 // app/api/analyze/route.ts

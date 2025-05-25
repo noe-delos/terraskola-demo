@@ -1,5 +1,3 @@
-"use server";
-
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // app/api/student-documents/route.ts

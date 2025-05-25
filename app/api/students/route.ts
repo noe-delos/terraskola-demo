@@ -1,5 +1,3 @@
-"use server";
-
 // app/api/students/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
