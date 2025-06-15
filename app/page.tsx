@@ -141,9 +141,9 @@ export default function Home() {
                   transition={{ duration: 0.5, delay: 0.5 }}
                   className="text-[#FFEEDE]/90 text-base mb-6 enriqueta-regular leading-relaxed"
                 >
-                  Révolutionnez l'évaluation pédagogique avec notre plateforme
-                  d'analyse intelligente adaptée aux établissements
-                  d'excellence.
+                  Générez des exercices de mathématiques personnalisés pour les
+                  concours HEC et EDHEC grâce à notre IA experte, entraînée sur
+                  les annales officielles des grandes écoles de commerce.
                 </motion.p>
 
                 <motion.div
