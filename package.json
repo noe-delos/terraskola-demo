@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.54.0",
     "@aws-sdk/client-bedrock-runtime": "^3.817.0",
+    "@iconify/react": "^6.0.0",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-progress": "^1.1.7",
@@ -21,6 +25,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "framer-motion": "^12.18.1",
+    "katex": "^0.16.22",
     "lucide-react": "^0.511.0",
     "next": "15.1.8",
     "openai": "^4.103.0",
@@ -29,6 +35,9 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
     "react-markdown": "^10.1.0",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7"

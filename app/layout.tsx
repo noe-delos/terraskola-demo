@@ -1,21 +1,17 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Enriqueta } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const enriqueta = Enriqueta({
+  variable: "--font-enriqueta",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
   title: "Terraskola",
-  description: "Classement IA de Copies",
+  description: "Plateforme d'analyse intelligente pour l'éducation",
 };
 
 export default function RootLayout({
@@ -24,10 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="fr">
+      <body className={`${enriqueta.variable} enriqueta-regular antialiased`}>
         {children}
         <Toaster richColors position="top-center" />
       </body>

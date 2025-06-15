@@ -1,9 +1,14 @@
 // app/analyze/student-category-table.tsx
 "use client";
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { Check, AlertTriangle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+import { motion } from "framer-motion";
+import { Icon } from "@iconify/react";
+import { useState } from "react";
 
 type Analysis = {
   id: string;
@@ -31,68 +36,78 @@ export function StudentCategoryTable({
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const bgColor = type === "good" ? "bg-green-50" : "bg-amber-50";
+  const bgColor = type === "good" ? "bg-green-50/50" : "bg-amber-50/50";
   const badgeColor =
     type === "good"
       ? "bg-green-100 text-green-800"
       : "bg-amber-100 text-amber-800";
-  const Icon = type === "good" ? Check : AlertTriangle;
+  const LucideIcon = type === "good" ? Check : AlertTriangle;
   const iconColor = type === "good" ? "text-green-500" : "text-amber-500";
 
   return (
-    <div className="rounded-lg border bg-white shadow-sm">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="rounded-lg border bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-300"
+    >
       <div className={`flex items-center gap-2 border-b ${bgColor} p-4`}>
-        <Icon className={`h-5 w-5 ${iconColor}`} />
-        <h2 className="text-lg font-medium text-gray-900">{title}</h2>
+        <LucideIcon className={`h-5 w-5 ${iconColor}`} />
+        <h2 className="text-lg font-medium text-[#1C352A] enriqueta-semibold">
+          {title}
+        </h2>
         <span
-          className={`ml-auto rounded-full ${badgeColor} px-2.5 py-1 text-xs font-medium`}
+          className={`ml-auto rounded-full ${badgeColor} px-2.5 py-1 text-xs font-medium enriqueta-medium`}
         >
           {students.length} élève{students.length !== 1 ? "s" : ""}
         </span>
       </div>
 
       {students.length === 0 ? (
-        <div className="p-4 text-center text-sm text-gray-500">
-          Aucun élève classé dans cette catégorie
-        </div>
+        <></>
       ) : (
         <div className="overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50 text-xs text-gray-500">
+            <thead className="bg-[#FFEEDE]/30 text-xs text-[#1C352A]/70">
               <tr>
-                <th className="px-4 py-2 text-left">Élève</th>
-                <th className="px-4 py-2 text-left">Catégorie</th>
-                <th className="px-4 py-2 text-right">Date</th>
+                <th className="px-4 py-2 text-left enriqueta-medium">Élève</th>
+                <th className="px-4 py-2 text-left enriqueta-medium">
+                  Catégorie
+                </th>
+                <th className="px-4 py-2 text-right enriqueta-medium">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {students.map((analysis) => (
-                <tr
+            <tbody className="divide-y divide-[#1C352A]/10">
+              {students.map((analysis, index) => (
+                <motion.tr
                   key={analysis.id}
-                  className="cursor-pointer hover:bg-gray-50"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="cursor-pointer hover:bg-[#FFEEDE]/20 transition-colors duration-200"
                   onClick={() => handleRowClick(analysis.id)}
                 >
-                  <td className="px-4 py-3 text-sm font-medium">
+                  <td className="px-4 py-3 text-sm font-medium text-[#1C352A] enriqueta-medium">
                     {analysis.students?.last_name}{" "}
                     {analysis.students?.first_name}
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+                    <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 enriqueta-medium">
                       {analysis.specific_category}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right text-xs text-gray-500">
+                  <td className="px-4 py-3 text-right text-xs text-[#1C352A]/60 enriqueta-regular">
                     {formatDistanceToNow(new Date(analysis.created_at), {
                       addSuffix: true,
                       locale: fr,
                     })}
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

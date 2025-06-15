@@ -131,13 +131,76 @@ ${documentContents}
 4. Crée également une catégorie spécifique plus précise qui décrit les forces ou les points à améliorer de l'élève.
 5. Fournis une analyse détaillée qui justifie ton évaluation.
 
+### INSTRUCTIONS DE FORMATAGE MARKDOWN STRICTES
+IMPORTANT : Respecte EXACTEMENT ces règles de formatage :
+
+1. **Titres principaux** : Utilise ## pour les sections principales (Vue d'ensemble, Points forts, etc.)
+2. **Sous-titres** : Utilise ### pour les sous-sections
+3. **Paragraphes** : Laisse TOUJOURS une ligne vide après chaque paragraphe
+4. **Listes** : Utilise des tirets (-) pour les listes à puces, avec une ligne vide avant et après la liste
+5. **Texte en gras** : Utilise **texte** pour mettre en évidence les points importants
+6. **Texte en italique** : Utilise *texte* pour les concepts clés
+7. **Formules mathématiques** : Utilise EXCLUSIVEMENT $$ formule $$ (doubles dollars) avec une ligne vide avant et après
+8. **Espacement** : Ajoute TOUJOURS des lignes vides entre les sections, paragraphes, et listes
+
+### EXEMPLE DE STRUCTURE EXACTE À SUIVRE
+
+## Vue d'ensemble
+
+Résumé général de la performance de l'élève avec une évaluation globale de son niveau.
+
+Cette section doit contenir au moins 2-3 phrases bien développées.
+
+## Points forts identifiés
+
+### Maîtrise des concepts de base
+
+L'élève démontre une bonne compréhension des concepts fondamentaux.
+
+- Premier point fort avec justification détaillée
+- Deuxième point fort avec exemple concret tiré des copies
+- Troisième point fort si applicable
+
+### Qualité du raisonnement
+
+Description détaillée de la logique et de la méthode de l'élève.
+
+Analyse approfondie avec des exemples spécifiques.
+
+## Points à améliorer
+
+### Erreurs techniques observées
+
+Identification précise des erreurs commises par l'élève.
+
+- Première erreur : explication claire et correction suggérée
+- Deuxième erreur : avec formule corrigée si nécessaire
+
+$$ f(x) = \\log(x) + 2 $$
+
+- Troisième erreur si applicable
+
+### Suggestions pédagogiques
+
+Recommandations concrètes pour l'amélioration.
+
+Plan d'action détaillé avec des exercices ou méthodes spécifiques.
+
+## Conclusion et recommandations
+
+Synthèse finale avec un plan d'action clair.
+
+Recommandations spécifiques pour la suite du parcours de l'élève.
+
 ### FORMAT DE RÉPONSE
 Retourne uniquement un objet JSON avec la structure suivante :
 {
   "main_category": "good" ou "bad",
   "specific_category": "Une brève description spécifique (max 10 mots)",
-  "analysis": "Une analyse détaillée justifiant l'évaluation"
+  "analysis": "Une analyse détaillée au format Markdown STRICTEMENT formatée selon les règles ci-dessus"
 }
+
+RAPPEL IMPORTANT : Ton analyse doit respecter EXACTEMENT le formatage Markdown spécifié avec les lignes vides, l'espacement, et la structure demandée.
 
 Ta réponse ne doit contenir AUCUN texte en dehors de cet objet JSON.`;
 

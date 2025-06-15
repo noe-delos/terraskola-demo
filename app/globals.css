@@ -2,11 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 @layer base {
   :root {
-
     --background: 0 0% 100%;
 
     --foreground: 0 0% 3.9%;
@@ -55,10 +52,9 @@
 
     --chart-5: 27 87% 67%;
 
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
   .dark {
-
     --background: 0 0% 3.9%;
 
     --foreground: 0 0% 98%;
@@ -105,11 +101,9 @@
 
     --chart-4: 280 65% 60%;
 
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
   }
 }
-
-
 
 @layer base {
   * {
@@ -118,4 +112,76 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Enriqueta Font Classes */
+.enriqueta-regular {
+  font-family: var(--font-enriqueta), serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.enriqueta-medium {
+  font-family: var(--font-enriqueta), serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.enriqueta-semibold {
+  font-family: var(--font-enriqueta), serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.enriqueta-bold {
+  font-family: var(--font-enriqueta), serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* New background color */
+.bg-terraskola-gradient {
+  background: #fff7ec;
+}
+
+/* Slider Styles */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, #3b82f6, #1d4ed8);
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slider::-moz-range-track {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  background: linear-gradient(to right, #3b82f6, #1d4ed8);
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
