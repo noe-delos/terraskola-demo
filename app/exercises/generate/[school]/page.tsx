@@ -97,7 +97,7 @@ export default function SchoolConfigPage() {
   };
 
   const nextStep = () => {
-    if (step < 3) setStep(step + 1);
+    if (step < 2) setStep(step + 1);
   };
 
   const prevStep = () => {
@@ -143,7 +143,7 @@ export default function SchoolConfigPage() {
             className="flex justify-center mb-12"
           >
             <div className="flex items-center space-x-4">
-              {[1, 2, 3].map((stepNumber) => (
+              {[1, 2].map((stepNumber) => (
                 <div key={stepNumber} className="flex items-center">
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold enriqueta-semibold transition-all duration-300 ${
@@ -154,7 +154,7 @@ export default function SchoolConfigPage() {
                   >
                     {stepNumber}
                   </div>
-                  {stepNumber < 3 && (
+                  {stepNumber < 2 && (
                     <div
                       className={`w-16 h-1 mx-2 transition-all duration-300 rounded-full ${
                         step > stepNumber
@@ -177,57 +177,6 @@ export default function SchoolConfigPage() {
             className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-[#1C352A]/10 mb-8 shadow-xl"
           >
             {step === 1 && (
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-[#1C352A] enriqueta-bold mb-4">
-                  Nombre d'exercices
-                </h2>
-                <p className="text-[#1C352A]/70 enriqueta-regular mb-8">
-                  Combien d'exercices souhaitez-vous générer ?
-                </p>
-
-                <div className="max-w-md mx-auto">
-                  <div className="mb-6 px-4">
-                    <input
-                      type="range"
-                      min="1"
-                      max="2"
-                      value={config.numberOfExercises}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          numberOfExercises: parseInt(e.target.value),
-                        })
-                      }
-                      className="w-full h-3 bg-[#1C352A]/20 rounded-lg appearance-none cursor-pointer slider-thumb"
-                      style={{
-                        background: `linear-gradient(to right, #1C352A 0%, #1C352A ${
-                          ((config.numberOfExercises - 1) / 1) * 100
-                        }%, #e5e7eb ${
-                          ((config.numberOfExercises - 1) / 1) * 100
-                        }%, #e5e7eb 100%)`,
-                      }}
-                    />
-                    <div className="flex justify-between text-xs text-[#1C352A]/50 mt-2 px-1">
-                      <span>1</span>
-                      <span>2</span>
-                    </div>
-                  </div>
-
-                  <div className="text-center">
-                    <span
-                      className={`text-6xl font-bold bg-gradient-to-r ${schoolInfo.color} bg-clip-text text-transparent enriqueta-bold`}
-                    >
-                      {config.numberOfExercises}
-                    </span>
-                    <p className="text-[#1C352A]/70 enriqueta-regular mt-2">
-                      exercice{config.numberOfExercises > 1 ? "s" : ""}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
               <div>
                 <h2 className="text-2xl font-bold text-[#1C352A] enriqueta-bold mb-4 text-center">
                   Niveau de difficulté
@@ -272,13 +221,13 @@ export default function SchoolConfigPage() {
               </div>
             )}
 
-            {step === 3 && (
+            {step === 2 && (
               <div>
                 <h2 className="text-2xl font-bold text-[#1C352A] enriqueta-bold mb-4 text-center">
                   Mode de génération
                 </h2>
                 <p className="text-[#1C352A]/70 enriqueta-regular mb-8 text-center">
-                  Comment souhaitez-vous que l'IA génère les exercices ?
+                  Comment souhaitez-vous que l'IA génère l'exercice ?
                 </p>
 
                 <div className="grid gap-4 max-w-2xl mx-auto">
@@ -336,7 +285,7 @@ export default function SchoolConfigPage() {
               Précédent
             </Button>
 
-            {step < 3 ? (
+            {step < 2 ? (
               <Button
                 onClick={nextStep}
                 className={`${schoolInfo.bgColor} ${schoolInfo.textColor} hover:shadow-lg enriqueta-semibold hover:scale-105 transition-all duration-300`}
@@ -353,7 +302,7 @@ export default function SchoolConfigPage() {
                 className={`${schoolInfo.bgColor} ${schoolInfo.textColor} hover:shadow-lg enriqueta-semibold hover:scale-105 transition-all duration-300`}
               >
                 <Icon icon="fluent-emoji:magic-wand" className="mr-2 h-4 w-4" />
-                Générer les exercices
+                Générer l'exercice
               </Button>
             )}
           </motion.div>

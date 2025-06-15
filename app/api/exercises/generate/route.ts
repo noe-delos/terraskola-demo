@@ -150,13 +150,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Cap the number of exercises at 2 for performance
-    const cappedNumberOfExercises = Math.min(numberOfExercises, 2);
-    if (cappedNumberOfExercises !== numberOfExercises) {
-      console.log(
-        `⚠️ Number of exercises capped from ${numberOfExercises} to ${cappedNumberOfExercises}`
-      );
-    }
+    // Cap the number of exercises at 1 for performance
+    const cappedNumberOfExercises = 1;
+    console.log(`📝 Generating exactly 1 exercise`);
 
     // Get school data
     const schoolDataMap: Record<string, string[]> = {
@@ -207,9 +203,7 @@ export async function POST(request: NextRequest) {
     const formattedPrompt = `Tu es un professeur de mathématiques expert spécialisé dans la préparation aux concours des grandes écoles de commerce.
 
 ### CONTEXTE
-Tu vas générer ${cappedNumberOfExercises} exercice${
-      cappedNumberOfExercises > 1 ? "s" : ""
-    } de mathématiques de ${
+Tu vas générer 1 exercice de mathématiques de ${
       difficultyDescriptions[difficulty as keyof typeof difficultyDescriptions]
     } pour des étudiants préparant le concours ${
       schoolNames[school as keyof typeof schoolNames]
@@ -223,9 +217,7 @@ ${examContent}
 
 ### INSTRUCTIONS SPÉCIFIQUES
 
-1. **Nombre d'exercices** : Génère exactement ${cappedNumberOfExercises} exercice${
-      cappedNumberOfExercises > 1 ? "s" : ""
-    } complet${cappedNumberOfExercises > 1 ? "s" : ""}
+1. **Nombre d'exercices** : Génère exactement 1 exercice complet
 
 2. **Niveau de difficulté** : ${
       difficultyDescriptions[difficulty as keyof typeof difficultyDescriptions]
@@ -242,38 +234,36 @@ ${examContent}
 4. **Contenu mathématique** :
    - Couvre les thèmes typiques des annales (analyse, algèbre, probabilités, etc.)
    - Utilise des techniques et méthodes appropriées au niveau demandé
-   - Assure-toi que les exercices sont cohérents et solvables
+   - Assure-toi que l'exercice est cohérent et solvable
 
 5. **Solutions détaillées** :
-   - Fournis une solution complète et détaillée pour chaque exercice
+   - Fournis une solution complète et détaillée pour l'exercice
    - Explique les étapes de raisonnement
    - Indique les techniques utilisées
    - Mentionne les points clés et les pièges à éviter
 
-### FORMATAGE MARKDOWN STRICT
+### FORMATAGE MARKDOWN ET LATEX STRICT
 - Utilise ## pour les titres d'exercices
 - Utilise ### pour les sous-parties
 - Utilise **texte** pour les points importants
 - Utilise *texte* pour les concepts clés
-- Pour les formules mathématiques : EXCLUSIVEMENT $$ formule $$ (doubles dollars)
-- Sépare clairement les exercices et leurs solutions
+- **FORMULES MATHÉMATIQUES** : 
+  - Pour les formules en ligne : $formule$
+  - Pour les formules centrées : $$formule$$
+  - Utilise la syntaxe LaTeX correcte : \\frac{a}{b}, \\sqrt{x}, \\int, \\sum, \\lim, etc.
+  - Pour les matrices : \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}
+  - Pour les systèmes : \\begin{cases} equation1 \\\\ equation2 \\end{cases}
+  - Échappe les caractères spéciaux : \\{, \\}, \\_, etc.
+- Sépare clairement l'exercice et sa solution
 - Utilise des listes à puces pour les étapes de résolution
 
 ### STRUCTURE ATTENDUE
 
 ## Exercice 1
-[Énoncé complet de l'exercice 1]
+[Énoncé complet de l'exercice 1 avec formules LaTeX correctement formatées]
 
 ### Solution de l'exercice 1
-[Solution détaillée avec explications]
-
-## Exercice 2
-[Énoncé complet de l'exercice 2]
-
-### Solution de l'exercice 2
-[Solution détaillée avec explications]
-
-[Continue pour tous les exercices...]
+[Solution détaillée avec explications et formules LaTeX correctement formatées]
 
 ### FORMAT DE RÉPONSE
 Retourne uniquement un objet JSON avec la structure suivante :
@@ -281,26 +271,25 @@ Retourne uniquement un objet JSON avec la structure suivante :
   "exercises": [
     {
       "title": "Exercice 1",
-      "content": "Énoncé complet au format Markdown",
-      "solution": "Solution détaillée au format Markdown"
-    },
-    {
-      "title": "Exercice 2", 
-      "content": "Énoncé complet au format Markdown",
-      "solution": "Solution détaillée au format Markdown"
+      "content": "Énoncé complet au format Markdown avec LaTeX",
+      "solution": "Solution détaillée au format Markdown avec LaTeX"
     }
   ],
   "metadata": {
     "school": "${school}",
     "difficulty": "${difficulty}",
     "mode": "${mode}",
-    "numberOfExercises": ${cappedNumberOfExercises}
+    "numberOfExercises": 1
   }
 }
 
-IMPORTANT : Respecte EXACTEMENT le formatage Markdown spécifié et assure-toi que les exercices sont de qualité professionnelle, dignes des concours ${
+IMPORTANT : 
+- Respecte EXACTEMENT le formatage Markdown et LaTeX spécifié
+- Assure-toi que toutes les formules mathématiques utilisent la syntaxe LaTeX correcte
+- L'exercice doit être de qualité professionnelle, digne des concours ${
       schoolNames[school as keyof typeof schoolNames]
-    }.
+    }
+- Vérifie que les formules LaTeX sont bien échappées et syntaxiquement correctes
 
 Ta réponse ne doit contenir AUCUN texte en dehors de cet objet JSON.`;
 
