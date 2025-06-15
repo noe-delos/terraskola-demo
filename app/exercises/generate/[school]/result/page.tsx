@@ -141,10 +141,12 @@ export default function ExercisesResultPage() {
   useEffect(() => {
     const generateExercises = async () => {
       try {
-        toast.info("Génération des exercices en cours...", {
+        toast.info("Génération de l'exercice en cours...", {
           description:
-            "L'IA analyse les annales et crée vos exercices personnalisés. Cette opération peut prendre plusieurs minutes.",
+            "L'IA analyse les annales et crée votre exercice personnalisé. Cette opération peut prendre plusieurs minutes.",
         });
+
+        console.log("🚀 Starting exercise generation with config:", config);
 
         const response = await fetch("/api/exercises/generate", {
           method: "POST",
@@ -154,22 +156,24 @@ export default function ExercisesResultPage() {
           body: JSON.stringify(config),
         });
 
+        console.log("📡 API response status:", response.status);
+
         if (!response.ok) {
-          throw new Error("Failed to generate exercises");
+          const errorData = await response.json();
+          console.error("❌ API error:", errorData);
+          throw new Error(errorData.message || "Failed to generate exercises");
         }
 
         const data = await response.json();
+        console.log("✅ Received complete response:", data);
+
         setExercisesData(data.exercises);
 
-        toast.success("Exercices générés avec succès !", {
-          description: `${config.numberOfExercises} exercice${
-            config.numberOfExercises > 1 ? "s" : ""
-          } créé${config.numberOfExercises > 1 ? "s" : ""} pour ${
-            schoolInfo.name
-          }`,
+        toast.success("Exercice généré avec succès !", {
+          description: `1 exercice créé pour ${schoolInfo.name}`,
         });
       } catch (error) {
-        console.error("Error generating exercises:", error);
+        console.error("❌ Error generating exercises:", error);
         toast.error("Erreur lors de la génération", {
           description: "Une erreur est survenue. Veuillez réessayer.",
         });
@@ -210,12 +214,10 @@ export default function ExercisesResultPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[#1C352A] enriqueta-bold">
-                Exercices {schoolInfo.name}
+                Exercice {schoolInfo.name}
               </h1>
               <p className="text-[#1C352A]/60 enriqueta-regular">
-                {config.numberOfExercises} exercice
-                {config.numberOfExercises > 1 ? "s" : ""} • Niveau{" "}
-                {config.difficulty} • Mode{" "}
+                1 exercice • Niveau {config.difficulty} • Mode{" "}
                 {config.mode === "modify" ? "modification" : "création"}
               </p>
             </div>
@@ -242,42 +244,40 @@ export default function ExercisesResultPage() {
           >
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-[#1C352A]/10 sticky top-8">
               <h2 className="text-lg font-semibold text-[#1C352A] enriqueta-semibold mb-4">
-                {loading ? "Génération..." : "Exercices"}
+                {loading ? "Génération..." : "Exercice"}
               </h2>
 
               <div className="space-y-3">
-                {loading
-                  ? // Loading skeletons
-                    Array.from({ length: config.numberOfExercises }).map(
-                      (_, index) => (
-                        <SkeletonCard key={index} className="h-16" />
-                      )
-                    )
-                  : // Exercise list
-                    exercisesData?.exercises.map((exercise, index) => (
+                {loading ? (
+                  // Loading skeleton
+                  <SkeletonCard className="h-16" />
+                ) : (
+                  // Exercise list
+                  exercisesData?.exercises.map((exercise, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setSelectedExercise(index)}
+                      className={`p-3 rounded-lg cursor-pointer transition-all ${
+                        selectedExercise === index
+                          ? `${schoolInfo.bgColor} ${schoolInfo.textColor}`
+                          : "bg-gray-50 hover:bg-gray-100"
+                      }`}
+                    >
+                      <div className="font-medium enriqueta-semibold text-sm">
+                        {exercise.title}
+                      </div>
                       <div
-                        key={index}
-                        onClick={() => setSelectedExercise(index)}
-                        className={`p-3 rounded-lg cursor-pointer transition-all ${
+                        className={`text-xs mt-1 ${
                           selectedExercise === index
-                            ? `${schoolInfo.bgColor} ${schoolInfo.textColor}`
-                            : "bg-gray-50 hover:bg-gray-100"
+                            ? "text-white/80"
+                            : "text-gray-500"
                         }`}
                       >
-                        <div className="font-medium enriqueta-semibold text-sm">
-                          {exercise.title}
-                        </div>
-                        <div
-                          className={`text-xs mt-1 ${
-                            selectedExercise === index
-                              ? "text-white/80"
-                              : "text-gray-500"
-                          }`}
-                        >
-                          Cliquez pour voir la solution
-                        </div>
+                        Cliquez pour voir la solution
                       </div>
-                    ))}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </motion.div>

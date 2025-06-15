@@ -2,19 +2,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import {
+  BedrockRuntimeClient,
+  ConverseCommand,
+} from "@aws-sdk/client-bedrock-runtime";
 import { createClient } from "@/lib/supabase/server";
 import { edhec_2001_exam, edhec_2003_exam } from "@/data/edhec";
 import {
   bce_hec_essec_2020_exam,
   bce_hec_essec_2021_fourier_exam,
 } from "@/data/hec";
-
-// Initialize Anthropic
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-  timeout: 900000,
-});
 
 // Helper function to extract JSON from text
 function extractJSON(text: string): string {
@@ -36,80 +33,6 @@ function extractJSON(text: string): string {
 
   console.log("⚠️ No JSON pattern found, returning original text");
   return text;
-}
-
-// Helper function to call Claude with streaming
-async function callClaudeWithStreaming(prompt: string): Promise<string> {
-  console.log("🌊 Starting Claude streaming call");
-
-  let accumulatedResponse = "";
-  let thinkingContent = "";
-  let mainContent = "";
-
-  try {
-    const stream = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-20250219",
-      max_tokens: 64000,
-      temperature: 1,
-      messages: [{ role: "user", content: prompt }],
-      thinking: {
-        type: "enabled",
-        budget_tokens: 16000,
-      },
-      stream: true,
-    });
-
-    console.log("📡 Claude stream created, processing chunks");
-
-    for await (const chunk of stream as any) {
-      console.log("📦 Chunk received:", chunk.type);
-
-      if (chunk.type === "content_block_start") {
-        console.log(
-          `🚀 Content block started - Index: ${chunk.index}, Type: ${chunk.content_block.type}`
-        );
-      } else if (chunk.type === "content_block_delta") {
-        console.log(
-          `📝 Content block delta - Index: ${chunk.index}, Text length: ${
-            chunk.delta.text?.length || 0
-          }`
-        );
-
-        if (chunk.index === 0) {
-          // This is the thinking content
-          thinkingContent += chunk.delta.text || "";
-          console.log(
-            `🧠 Thinking chunk: ${chunk.delta.text?.substring(0, 100)}...`
-          );
-        } else if (chunk.index === 1) {
-          // This is the main response content
-          const deltaText = chunk.delta.text || "";
-          mainContent += deltaText;
-          accumulatedResponse += deltaText;
-          console.log(
-            `💬 Main content chunk: ${deltaText.substring(0, 100)}...`
-          );
-        }
-      } else if (chunk.type === "content_block_stop") {
-        console.log(`🛑 Content block stopped - Index: ${chunk.index}`);
-      } else if (chunk.type === "message_start") {
-        console.log("🎬 Message started");
-      } else if (chunk.type === "message_delta") {
-        console.log("📊 Message delta:", chunk.delta);
-      } else if (chunk.type === "message_stop") {
-        console.log("🏁 Message stopped");
-      }
-    }
-
-    console.log("✅ Streaming completed");
-    console.log(`🧠 Total thinking content length: ${thinkingContent.length}`);
-    console.log(`💬 Total main content length: ${mainContent.length}`);
-
-    return mainContent;
-  } catch (error) {
-    console.error("❌ Error during streaming:", error);
-    throw error;
-  }
 }
 
 export async function POST(request: NextRequest) {
@@ -299,20 +222,86 @@ Ta réponse ne doit contenir AUCUN texte en dehors de cet objet JSON.`;
       "characters"
     );
 
-    console.log("🤖 Sending request to Claude with streaming...");
+    // Create the AWS Bedrock client
+    const client = new BedrockRuntimeClient({
+      region: process.env.AWS_REGION as string,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+      },
+    });
 
-    // Use Claude with streaming
+    console.log("🤖 Calling Claude via AWS Bedrock with thinking mode...");
+
+    // Format the messages
+    const messages = [
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: formattedPrompt,
+          },
+        ],
+      },
+    ];
+
+    // Use thinking mode with higher budget for complex exercise generation
+    const reasoningConfig = {
+      thinking: {
+        type: "enabled",
+        budget_tokens: 4000,
+      },
+    };
+
+    // Create the command
+    const command = new ConverseCommand({
+      modelId: "eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
+      messages: messages as any,
+      additionalModelRequestFields: reasoningConfig,
+      inferenceConfig: {
+        maxTokens: 64000,
+        temperature: 1,
+      },
+    });
+
+    // Send the command and get response
     let rawResponse = "";
     try {
-      rawResponse = await callClaudeWithStreaming(formattedPrompt);
-      console.log("✅ Claude streaming completed");
+      console.log("📡 Sending request to AWS Bedrock...");
+      const response = await client.send(command);
+      console.log("✅ Received response from AWS Bedrock");
+
+      // Extract content from response
+      if (response.output?.message?.content) {
+        for (const block of response.output.message.content) {
+          if ("text" in block) {
+            rawResponse = block.text || "";
+            break;
+          }
+        }
+      }
+
       console.log(`📄 Raw response length: ${rawResponse.length}`);
+
+      // Verify we have a substantial response
+      if (!rawResponse || rawResponse.trim().length < 50) {
+        throw new Error("Response too short or empty");
+      }
 
       // Extract JSON from the response
       rawResponse = extractJSON(rawResponse);
+
+      // Verify JSON extraction was successful
+      if (!rawResponse || rawResponse.trim().length === 0) {
+        throw new Error("Failed to extract JSON from response");
+      }
     } catch (error) {
-      console.error("❌ Error in Claude streaming process:", error);
-      throw error;
+      console.error("❌ Error in AWS Bedrock process:", error);
+      return NextResponse.json(
+        { message: "Failed to generate exercises", error: String(error) },
+        { status: 500 }
+      );
     }
 
     console.log(
@@ -346,16 +335,40 @@ Ta réponse ne doit contenir AUCUN texte en dehors de cet objet JSON.`;
         "📊 Number of exercises generated:",
         exercisesData.exercises?.length || 0
       );
+
+      // Validate the structure
+      if (!exercisesData.exercises || !Array.isArray(exercisesData.exercises)) {
+        throw new Error("Invalid exercises structure");
+      }
+
+      if (exercisesData.exercises.length === 0) {
+        throw new Error("No exercises generated");
+      }
+
+      // Validate each exercise has required fields
+      for (let i = 0; i < exercisesData.exercises.length; i++) {
+        const exercise = exercisesData.exercises[i];
+        if (!exercise.title || !exercise.content || !exercise.solution) {
+          throw new Error(`Exercise ${i + 1} is missing required fields`);
+        }
+      }
+
+      console.log("✅ Exercise data validation passed");
     } catch (e) {
-      console.error("❌ Error parsing JSON response:", e);
+      console.error("❌ Error parsing or validating JSON response:", e);
       console.error("🔍 Raw content:", rawResponse);
       return NextResponse.json(
-        { message: "Failed to parse exercises results" },
+        {
+          message: "Failed to parse or validate exercises results",
+          error: String(e),
+        },
         { status: 500 }
       );
     }
 
-    console.log("🎉 Exercise generation completed successfully");
+    console.log(
+      "🎉 Exercise generation completed successfully - returning complete response"
+    );
 
     return NextResponse.json({
       message: "Exercises generated successfully",
